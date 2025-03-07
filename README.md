@@ -1,0 +1,1 @@
+Legacy SPI communication (without beginTransaction) not tested/supported
