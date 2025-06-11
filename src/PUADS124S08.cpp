@@ -8,6 +8,7 @@ PUADS124S08::PUADS124S08()
 void PUADS124S08::deselect()
 {
   digitalWrite(cs, HIGH);
+  SPI.endTransaction();
   // Wait >~20ns
   asm (
     "nop" "\n"
@@ -49,23 +50,31 @@ PUADS124S08::PUADS124S08(int cs) : cs(cs)
 bool PUADS124S08::reset()
 {
   select();
-  delay(10);
-  SPI.transfer(0x06);
+  SPI.transfer(Commands::RESET);
   deselect();
 
-  delayMicroseconds(82);
+  delay(2);
   if (!isready())
   {
     return false;
   }
-  // TODO: FL_POR flag
+  writebit(Registers::STATUS, false, 7);
   return true;
 }
 
 bool PUADS124S08::isready()
 {
   uint8_t byte = readb(Registers::STATUS);
-  return (byte & 0b01000000);
+
+  #ifdef DEBUG
+  Serial.println(millis());
+  Serial.print("Status register: ");
+  Serial.print("0b");
+  Serial.print(byte, BIN);
+  Serial.println();
+  #endif
+
+  return !(byte & 0b01000000);
 }
 
 uint8_t PUADS124S08::readb(uint8_t adrr)
@@ -78,4 +87,107 @@ uint8_t PUADS124S08::readb(uint8_t adrr)
   r = SPI.transfer(0x00);
   deselect();
   return r;
+}
+
+#ifdef DEBUG
+PUADS124S08::allregs PUADS124S08::readall()
+{
+  struct allregs regs;
+  select();
+  SPI.transfer(Commands::RREG);
+  SPI.transfer(0b00010011);
+  regs.r0 = SPI.transfer(0x00);
+  regs.r1 = SPI.transfer(0x00);
+  regs.r2 = SPI.transfer(0x00);
+  regs.r3 = SPI.transfer(0x00);
+  regs.r4 = SPI.transfer(0x00);
+  regs.r5 = SPI.transfer(0x00);
+  regs.r6 = SPI.transfer(0x00);
+  regs.r7 = SPI.transfer(0x00);
+  regs.r8 = SPI.transfer(0x00);
+  regs.r9 = SPI.transfer(0x00);
+  regs.r10 = SPI.transfer(0x00);
+  regs.r11 = SPI.transfer(0x00);
+  regs.r12 = SPI.transfer(0x00);
+  regs.r13 = SPI.transfer(0x00);
+  regs.r14 = SPI.transfer(0x00);
+  regs.r15 = SPI.transfer(0x00);
+  regs.r16 = SPI.transfer(0x00);
+  regs.r17 = SPI.transfer(0x00);
+  deselect();
+  return regs;
+}
+#endif
+
+void PUADS124S08::writeb(uint8_t adrr, uint8_t byte)
+{
+  uint8_t com = Commands::WREG | (adrr & 0b00011111);
+  select();
+  SPI.transfer(com);
+  SPI.transfer(0x00);
+  SPI.transfer(byte);
+  deselect();
+}
+
+void PUADS124S08::writebit(uint8_t adrr, bool val, unsigned int nbit)
+{
+  if (nbit > 7) return;
+
+  int b;
+  if (val)
+  {
+    b = 0b1;
+  } else {
+    b = 0b0;
+  }
+
+  uint8_t byte = readb(adrr) & (b << nbit);
+
+  uint8_t com = Commands::WREG | (adrr & 0b00011111);
+  select();
+  SPI.transfer(com);
+  SPI.transfer(0x00);
+  SPI.transfer(byte);
+  deselect();
+}
+
+void PUADS124S08::selpchannel(int n)
+{
+  if (n > 12) return;
+  uint8_t nmux = readb(Registers::INPMUX) & (0b11110000 & (n << 4));
+  writeb(Registers::INPMUX, nmux);
+}
+
+void PUADS124S08::selnchannel(int n)
+{
+  if (n > 12) return;
+  uint8_t nmux = readb(Registers::INPMUX) & (0b00001111 & n);
+  writeb(Registers::INPMUX, nmux);
+}
+
+void PUADS124S08::start()
+{
+  select();
+  SPI.transfer(Commands::START);
+  deselect();
+}
+
+void PUADS124S08::stop()
+{
+  select();
+  SPI.transfer(Commands::STOP);
+  deselect();
+}
+
+int PUADS124S08::getv()
+{
+  int data = 0;
+  select();
+  SPI.transfer(Commands::RDATA);
+  uint8_t b1 = SPI.transfer(0x00);
+  uint8_t b2 = SPI.transfer(0x00);
+  uint8_t b3 = SPI.transfer(0x00);
+  deselect();
+  data = (b1 << 16) | (b2 << 8) | b3;
+  return data;
 }
