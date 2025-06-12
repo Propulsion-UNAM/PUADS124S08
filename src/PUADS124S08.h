@@ -9,7 +9,7 @@
 #define DEFAULT_SPI_DATA_ORDER MSBFIRST // Datasheet pg. 70
 #define DEFAULT_SPI_DATA_MODE SPI_MODE1 // Datasheet pg. 86
 
-#define CH_AINCOM 12
+#define CH_AINCOM 0b1100 // 12
 
 class PUADS124S08
 {
@@ -152,7 +152,7 @@ class PUADS124S08
   /**
    * Get value from the actual channel
    */
-  int getv();
+  uint32_t getv();
 };
 
 #endif

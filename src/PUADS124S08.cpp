@@ -27,7 +27,6 @@ void PUADS124S08::select()
 {
   SPI.beginTransaction(spisett);
   digitalWrite(cs, LOW);
-  // TODO: Wait 4096 * (1 / freq)
   asm (
     "nop" "\n"
     "nop" "\n"
@@ -141,7 +140,7 @@ void PUADS124S08::writebit(uint8_t adrr, bool val, unsigned int nbit)
     b = 0b0;
   }
 
-  uint8_t byte = readb(adrr) & (b << nbit);
+  uint8_t byte = (readb(adrr) & ~(1 << nbit)) | (b << nbit);
 
   uint8_t com = Commands::WREG | (adrr & 0b00011111);
   select();
@@ -154,14 +153,14 @@ void PUADS124S08::writebit(uint8_t adrr, bool val, unsigned int nbit)
 void PUADS124S08::selpchannel(int n)
 {
   if (n > 12) return;
-  uint8_t nmux = readb(Registers::INPMUX) & (0b11110000 & (n << 4));
+  uint8_t nmux = (readb(Registers::INPMUX) & 0b00001111) | (0b11110000 & (n << 4));
   writeb(Registers::INPMUX, nmux);
 }
 
 void PUADS124S08::selnchannel(int n)
 {
   if (n > 12) return;
-  uint8_t nmux = readb(Registers::INPMUX) & (0b00001111 & n);
+  uint8_t nmux = (readb(Registers::INPMUX) & 0b11110000) | (0b00001111 & n);
   writeb(Registers::INPMUX, nmux);
 }
 
@@ -179,9 +178,9 @@ void PUADS124S08::stop()
   deselect();
 }
 
-int PUADS124S08::getv()
+uint32_t PUADS124S08::getv()
 {
-  int data = 0;
+  uint32_t data = 0;
   select();
   SPI.transfer(Commands::RDATA);
   uint8_t b1 = SPI.transfer(0x00);
