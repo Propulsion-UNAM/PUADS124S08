@@ -150,9 +150,9 @@ class PUADS124S08
   void stop();
 
   /**
-   * Get value from the actual channel
+   * Get value from the actual channel (signed)
    */
-  uint32_t getv();
+  int getv();
 };
 
 #endif

@@ -178,9 +178,9 @@ void PUADS124S08::stop()
   deselect();
 }
 
-uint32_t PUADS124S08::getv()
+int PUADS124S08::getv()
 {
-  uint32_t data = 0;
+  int data = 0;
   select();
   SPI.transfer(Commands::RDATA);
   uint8_t b1 = SPI.transfer(0x00);
@@ -188,5 +188,11 @@ uint32_t PUADS124S08::getv()
   uint8_t b3 = SPI.transfer(0x00);
   deselect();
   data = (b1 << 16) | (b2 << 8) | b3;
+
+  if (data & 0b100000000000000000000000)
+  {
+    data = data | 0b11111111000000000000000000000000;
+  }
+
   return data;
 }
