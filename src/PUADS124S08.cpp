@@ -204,8 +204,8 @@ int PUADS124S08::getv()
 void PUADS124S08::setdelay(int d)
 {
   if (d > 7) return;
-  uint8_t nmux = (readb(Registers::INPMUX) & 0b00011111) | (0b00000111 & (d << 5));
-  writeb(Registers::INPMUX, nmux);
+  uint8_t gset = (readb(Registers::GAINSET) & 0b00011111) | (0b00000111 & (d << 5));
+  writeb(Registers::GAINSET, gset);
 }
 
 int PUADS124S08::getswitchdelay()
@@ -235,5 +235,23 @@ int PUADS124S08::getswitchdelay()
     return 207;
   } else {
     return 407;
+  }
+}
+
+void PUADS124S08::setdatarate(int d)
+{
+  if (d > 13) return;
+  uint8_t drate = (readb(Registers::DATARATE) & 0b11110000) | (0b00001111 & d);
+  writeb(Registers::DATARATE, drate);
+
+  // TODO: all sps
+  switch (d)
+  {
+  case Datarates::SPS4000:
+    sps = 4000;
+    break;
+  
+  default:
+    break;
   }
 }

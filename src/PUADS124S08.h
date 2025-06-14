@@ -47,9 +47,14 @@ class PUADS124S08
   enum Registers {
     STATUS = 0x01, //!< FL_POR | !RDY | FL_P_RAILP | FL_P_RAILN | FL_N_RAILP | FL_N_RAILN | FL_REF_L1 | FL_REF_L0
     INPMUX = 0x02, //!< 7:4 MUXP[3:0] | 3:0 MUXN[3:0]
+    GAINSET = 0x03,
+    DATARATE = 0x04,
     REF = 0x05 //!< 7:6 FL_REF_EN[1:0] | !REFP_BUF | !REFN_BUF | 3:2 REFSEL[1:0] | 1:0 REFCON[1:0]
   };
 
+  /**
+   * Valid channels
+   */
   enum Channels {
     CH_AIN0   = 0b0000,  //!< 0
     CH_AIN1   = 0b0001,  //!< 1
@@ -66,6 +71,9 @@ class PUADS124S08
     CH_AINCOM = 0b1100   //!< 12
   };
 
+  /**
+   * Valid delays
+   */
   enum Delays {
     TMOD1    = 0b111,
     TMOD14   = 0b001,
@@ -75,6 +83,26 @@ class PUADS124S08
     TMOD1024 = 0b101,
     TMOD2048 = 0b110,
     TMOD4096 = 0b110
+  };
+
+  /**
+   * Valid datarates
+   */
+  enum Datarates {
+    SPS2_5   = 0b0000,
+    SPS5     = 0b0001,
+    SPS10    = 0b0010,
+    SPS16_6  = 0b0011,
+    SPS20    = 0b0100,
+    SPS50    = 0b0101,
+    SPS60    = 0b0110,
+    SPS100   = 0b0111,
+    SPS200   = 0b1000,
+    SPS400   = 0b1001,
+    SPS800   = 0b1010,
+    SPS1000  = 0b1011,
+    SPS2000  = 0b1100,
+    SPS4000  = 0b1101
   };
 
   /**
@@ -183,6 +211,7 @@ class PUADS124S08
 
   /**
    * Set start conversion delay
+   * @param d delay number
    */
   void setdelay(int d);
 
@@ -190,6 +219,12 @@ class PUADS124S08
    * Get start conversion delay (ms)
    */
   int getswitchdelay();
+
+  /**
+   * Set samples per second
+   * @param d data rate
+   */
+  void setdatarate(int d);
 };
 
 #endif
