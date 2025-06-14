@@ -155,6 +155,8 @@ void PUADS124S08::selpchannel(int n)
   if (n > 12) return;
   uint8_t nmux = (readb(Registers::INPMUX) & 0b00001111) | (0b11110000 & (n << 4));
   writeb(Registers::INPMUX, nmux);
+  // TODO: Optional delay
+  delay(getswitchdelay());
 }
 
 void PUADS124S08::selnchannel(int n)
@@ -162,6 +164,8 @@ void PUADS124S08::selnchannel(int n)
   if (n > 12) return;
   uint8_t nmux = (readb(Registers::INPMUX) & 0b11110000) | (0b00001111 & n);
   writeb(Registers::INPMUX, nmux);
+  // TODO: Optional delay
+  delay(getswitchdelay());
 }
 
 void PUADS124S08::start()
@@ -195,4 +199,41 @@ int PUADS124S08::getv()
   }
 
   return data;
+}
+
+void PUADS124S08::setdelay(int d)
+{
+  if (d > 7) return;
+  uint8_t nmux = (readb(Registers::INPMUX) & 0b00011111) | (0b00000111 & (d << 5));
+  writeb(Registers::INPMUX, nmux);
+}
+
+int PUADS124S08::getswitchdelay()
+{
+  if (sps >= 2000)
+  {
+    return 1;
+  } else if (sps >= 800) {
+    return 2;
+  } else if (sps >= 400) {
+    return 3;
+  } else if (sps >= 200) {
+    return 6;
+  } else if (sps >= 100) {
+    return 11;
+  } else if (sps >= 60) {
+    return 17;
+  } else if (sps >= 50) {
+    return 21;
+  } else if (sps >= 20) {
+    return 57;
+  } else if (sps >= 16.6) {
+    return 61;
+  } else if (sps >= 10) {
+    return 107;
+  } else if (sps >= 5) {
+    return 207;
+  } else {
+    return 407;
+  }
 }
