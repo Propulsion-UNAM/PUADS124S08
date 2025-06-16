@@ -150,29 +150,32 @@ void PUADS124S08::writebit(uint8_t adrr, bool val, unsigned int nbit)
   deselect();
 }
 
-void PUADS124S08::selpchannel(int n)
+void PUADS124S08::selpchannel(int n, bool wait)
 {
   if (n > 12) return;
   uint8_t nmux = (readb(Registers::INPMUX) & 0b00001111) | (0b11110000 & (n << 4));
   writeb(Registers::INPMUX, nmux);
-  // TODO: Optional delay
-  delay(getswitchdelay());
+  if (!wait) return;
+  delayMicroseconds(getswitchdelay());
 }
 
-void PUADS124S08::selnchannel(int n)
+void PUADS124S08::selnchannel(int n, bool wait)
 {
   if (n > 12) return;
   uint8_t nmux = (readb(Registers::INPMUX) & 0b11110000) | (0b00001111 & n);
   writeb(Registers::INPMUX, nmux);
-  // TODO: Optional delay
-  delay(getswitchdelay());
+  if (!wait) return;
+  delayMicroseconds(getswitchdelay());
 }
 
-void PUADS124S08::start()
+void PUADS124S08::start(bool wait)
 {
   select();
   SPI.transfer(Commands::START);
   deselect();
+  if (!wait) return;
+  // TODO: determinar tiempo
+  // delayMicroseconds(30);
 }
 
 void PUADS124S08::stop()
@@ -210,31 +213,34 @@ void PUADS124S08::setdelay(int d)
 
 int PUADS124S08::getswitchdelay()
 {
-  if (sps >= 2000)
-  {
-    return 1;
+  if (sps >= 4000) {
+    return 410;
+  } else if (sps >= 2000) {
+    return 660;
+  } else if (sps >= 1000) {
+    return 1200;
   } else if (sps >= 800) {
-    return 2;
+    return 1500;
   } else if (sps >= 400) {
-    return 3;
+    return 2700;
   } else if (sps >= 200) {
-    return 6;
+    return 5200;
   } else if (sps >= 100) {
-    return 11;
+    return 10200;
   } else if (sps >= 60) {
-    return 17;
+    return 17000;
   } else if (sps >= 50) {
-    return 21;
+    return 20200;
   } else if (sps >= 20) {
-    return 57;
+    return 56600;
   } else if (sps >= 16.6) {
-    return 61;
+    return 60300;
   } else if (sps >= 10) {
-    return 107;
+    return 106600;
   } else if (sps >= 5) {
-    return 207;
+    return 206600;
   } else {
-    return 407;
+    return 406600;
   }
 }
 

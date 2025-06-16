@@ -185,19 +185,22 @@ class PUADS124S08
   /**
    * Select positive channel
    * @param n channel number
+   * @param wait wait for switch time [default = true]
    */
-  void selpchannel(int n);
+  void selpchannel(int n, bool wait = true);
 
   /**
    * Select positive channel
    * @param n channel number
+   * @param wait wait for switch time [default = true]
    */
-  void selnchannel(int n);
+  void selnchannel(int n, bool wait = true);
 
   /**
    * Start conversions
+   * @param wait wait for start conversion [default = true]
    */
-  void start();
+  void start(bool wait = true);
 
   /**
    * Stop conversions
@@ -216,7 +219,7 @@ class PUADS124S08
   void setdelay(int d);
 
   /**
-   * Get start conversion delay (ms)
+   * Get start conversion delay (microseconds)
    */
   int getswitchdelay();
 
