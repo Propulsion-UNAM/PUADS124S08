@@ -250,14 +250,53 @@ void PUADS124S08::setdatarate(int d)
   uint8_t drate = (readb(Registers::DATARATE) & 0b11110000) | (0b00001111 & d);
   writeb(Registers::DATARATE, drate);
 
-  // TODO: all sps
   switch (d)
   {
   case Datarates::SPS4000:
     sps = 4000;
     break;
+  case Datarates::SPS2000:
+    sps = 2000;
+    break;
+  case Datarates::SPS1000:
+    sps = 1000;
+    break;
+  case Datarates::SPS800:
+    sps = 800;
+    break;
+  case Datarates::SPS400:
+    sps = 400;
+    break;
+  case Datarates::SPS200:
+    sps = 200;
+    break;
+  case Datarates::SPS100:
+    sps = 100;
+    break;
+  case Datarates::SPS60:
+    sps = 60;
+    break;
+  case Datarates::SPS50:
+    sps = 50;
+    break;
+  case Datarates::SPS20:
+    sps = 20;
+    break;
+  case Datarates::SPS16_6:
+    sps = 16.6;
+    break;
+  case Datarates::SPS10:
+    sps = 10;
+    break;
+  case Datarates::SPS5:
+    sps = 5;
+    break;
+  case Datarates::SPS2_5:
+    sps = 2.5;
+    break;
   
   default:
+    sps = 4000;
     break;
   }
 }
