@@ -174,8 +174,7 @@ void PUADS124S08::start(bool wait)
   SPI.transfer(Commands::START);
   deselect();
   if (!wait) return;
-  // TODO: determinar tiempo
-  // delayMicroseconds(30);
+  delayMicroseconds(pgadelay * 4);
 }
 
 void PUADS124S08::stop()
@@ -207,8 +206,40 @@ int PUADS124S08::getv()
 void PUADS124S08::setdelay(int d)
 {
   if (d > 7) return;
-  uint8_t gset = (readb(Registers::GAINSET) & 0b00011111) | (0b00000111 & (d << 5));
+  uint8_t gset = (readb(Registers::GAINSET) & 0b00011111) | (0b11100000 & (d << 5));
   writeb(Registers::GAINSET, gset);
+
+  switch (d)
+  {
+  case Delays::TMOD1:
+    pgadelay = 1;
+    break;
+  case Delays::TMOD14:
+    pgadelay = 14;
+    break;
+  case Delays::TMOD25:
+    pgadelay = 25;
+    break;
+  case Delays::TMOD64:
+    pgadelay = 64;
+    break;
+  case Delays::TMOD256:
+    pgadelay = 256;
+    break;
+  case Delays::TMOD1024:
+    pgadelay = 1024;
+    break;
+  case Delays::TMOD2048:
+    pgadelay = 2048;
+    break;
+  case Delays::TMOD4096:
+    pgadelay = 4096;
+    break;
+  
+  default:
+    pgadelay = 1;
+    break;
+  }
 }
 
 int PUADS124S08::getswitchdelay()

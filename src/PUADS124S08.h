@@ -15,6 +15,7 @@ class PUADS124S08
   private:
   int cs; //!< Chip Select pin
   float sps = 20;
+  int pgadelay = 14;
   SPISettings spisett = SPISettings(DEFAULT_SPI_SPEED, DEFAULT_SPI_DATA_ORDER, DEFAULT_SPI_DATA_MODE); //!< SPI Settings
 
   public:
@@ -76,12 +77,12 @@ class PUADS124S08
    */
   enum Delays {
     TMOD1    = 0b111,
-    TMOD14   = 0b001,
-    TMOD25   = 0b010,
-    TMOD64   = 0b011,
-    TMOD256  = 0b100,
-    TMOD1024 = 0b101,
-    TMOD2048 = 0b110,
+    TMOD14   = 0b000,
+    TMOD25   = 0b001,
+    TMOD64   = 0b010,
+    TMOD256  = 0b011,
+    TMOD1024 = 0b100,
+    TMOD2048 = 0b101,
     TMOD4096 = 0b110
   };
 
